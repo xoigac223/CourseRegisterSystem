@@ -1,0 +1,102 @@
+@model PaginatedList<CourseRegisterSystem.Models.Class>
+
+@{
+    ViewData["Title"] = "Danh sách lớp mở";
+}
+
+<h1>Danh sách các lớp mở kì - @ViewData["TermName"]</h1>
+
+<form asp-action="List" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Tìm kiếm với mã học phần: <input type="text" name="CourseId" value="@ViewData["CurrentCourseId"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="List">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<form asp-action="List" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Tìm kiếm với mã lớp: <input type="text" name="ClassId" value="@ViewData["CurrentClassId"]" />
+            <input type="submit" value="Search" class="btn btn-default" />
+        </p>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Mã lớp
+            </th>
+            <th>
+                Mã học phần
+            </th>
+            <th>
+                Tên học phần
+            </th>
+            <th>
+                Số tín chỉ
+            </th>
+            <th>
+                Kì học
+            </th>
+            <th>
+                Tên giáo viên
+            </th>
+            <th>
+                Số lượng tối đa
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model)
+{
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CourseId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Course.Credit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Term.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lecturer.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Max)
+            </td>
+        </tr> 
+}
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="List"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentCourseId="@ViewData["CurrentCourseId"]"
+   asp-route-currentClassId="@ViewData["CurrentClassId"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="List"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentCourseId="@ViewData["CurrentCourseId"]"
+   asp-route-currentClassId="@ViewData["CurrentClassId"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

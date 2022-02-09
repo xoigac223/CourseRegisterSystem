@@ -1,0 +1,235 @@
+@model IEnumerable<CourseRegisterSystem.DTO.EnrollmentDto>
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "Đăng ký lớp";
+}
+
+<table cellpadding="0" cellspacing="0" class="table table-responsive">
+    <thead>
+        <tr>
+            <th style="width:150px">Mã lớp</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+    <tfoot>
+        <tr>
+            <td><input type="number" id="class_id" /></td>
+            <td><input type="button" id="btnAdd" class="btn
+btn-success btn-sm" value="Thêm" /></td>
+        </tr>
+    </tfoot>
+</table>
+<br />
+<input type="button" id="btnSave" value="Lưu" class="bnt
+btn-block btn-success" />
+<br/>
+<br>
+<table class="table table-bordered table-responsive" id="tblEnrollments">
+    <thead>
+        <tr>
+            <th style="width:200px">
+                @Html.DisplayNameFor(model => model.ClassId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CourseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CourseId)
+            </th>
+            <th style="width:200px"></th>
+        </tr>
+    </thead>
+    <tbody class="#classTable">
+
+        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.ClassId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CourseName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CourseId)</td>
+                    <td><input type="button" value="Remove" class="btn
+btn-danger btn-sm" onclick="Remove(this)" /></td>
+                </tr>
+            }
+        }
+
+    </tbody>
+</table>
+@section Scripts
+{
+    <script type="text/javascript">
+
+        let currentEnrollments = JSON.parse('@Html.Raw(Json.Serialize(Model))');
+        let studentId = '@ViewData["StudentId"]';  
+        let classes;
+       
+        $.ajax({
+            type: "GET",
+            url: "/Student/Course/GetClasses",
+            success: function(result) {
+                classes = result;
+            }
+        });
+
+        $("#btnAdd").click(function() {
+            let classId = $("#class_id").val();
+            let tBody = $("#tblEnrollments > TBODY")[0];
+            let lop = getClass(classId);
+            
+            if (lop !== null) {
+
+                var currentClasses = $("#tblEnrollments tr");
+
+                if (!isExist(classId)) {
+                    if (currentClasses.length <= 3) {
+
+                        var row = tBody.insertRow(-1)
+                      
+                        // Add Class Id
+                        var cell = $(row.insertCell(-1));
+                        cell.html(classId); 
+                        
+                        // Add Course Name
+                        var cell = $(row.insertCell(-1));
+                        cell.html(lop.course.name);
+                        
+                        // Add Course Id
+                        var cell = $(row.insertCell(-1));
+                        cell.html(lop.courseId);
+
+                        // Add Button Remove
+                        var cell = $(row.insertCell(-1));
+                        var btnRemove = $("<input/>");
+                        btnRemove.attr("type", "button");
+                        btnRemove.attr("onclick", "Remove(this);");
+                        btnRemove.attr("class", "btn btn-danger btn-sm")
+                        btnRemove.val("Remove");
+                        cell.append(btnRemove);                      
+                    } else {
+                        alert("Chỉ được đăng ký tối đa 3 học phần");
+                    }
+                } else {
+                    alert("Trùng mã lớp");
+                }
+                
+;            } else {
+                alert("Lớp không tồn tại");
+             }
+            
+             $("#class_id").val("");
+        });
+
+        function getClass(classId) {
+
+            let result = null;
+
+            for (const element of classes) {
+                if (element.id == classId) {
+                    result = element;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        function isExist(classId) {
+            var result = false;
+
+            var currentClasses = $("#tblEnrollments tr");
+
+        
+            currentClasses.each(function(index, tr) {
+                if (index != 0) {
+                    if (classId == $(this).find("td:first").html()) {
+                        result = true;
+                        return false;
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        function Remove(button) {
+            var row = $(button).closest("TR");
+            var name = $("TD", row).eq(0).html();
+            if (confirm("Do you want to delete:" + name)) {
+                var table = $("#tblEnrollments")[0];
+                table.deleteRow(row[0].rowIndex);
+            }
+        }
+        
+        function isInCurrentEnrollments(enrollment) {
+            let result = false;
+            for (let i = 0; i < currentEnrollments.length; i++) {
+                if (currentEnrollments[i].classId == enrollment.classId) {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        $("#btnSave").click(function() {
+            
+          let addEnrollments = new Array();
+          let removeEnrollments = [];
+          let tableEnrollments = [];
+          $("#tblEnrollments TBODY TR").each(function() {
+            let row = $(this);
+            let enrollment = {};
+            enrollment.classId = parseInt(row.find("TD").eq(0).html());
+            enrollment.studentId = studentId;
+            tableEnrollments.push(enrollment);
+          });
+          
+          tableEnrollments.forEach(function (enrollment) {
+              if (!isInCurrentEnrollments(enrollment)) {
+                 enrollment.creatAt = (new Date()).toISOString().split('T')[0] + 'T00:00:00';
+                 addEnrollments.push(enrollment); 
+              }
+          });
+          
+          currentEnrollments.forEach(function (currentEnroll) {
+              let isExist = false;
+              for (let i = 0; i < tableEnrollments.length; i++) {
+                  if (currentEnroll.classId == tableEnrollments[i].classId) {
+                      isExist = true;
+                      break;
+                  }
+              }
+              if (!isExist) removeEnrollments.push(currentEnroll);
+          });
+          
+          console.log(addEnrollments);
+          console.log(removeEnrollments);
+          $.ajax({
+            type: "POST",
+            url: "/Student/Course/InsertEnrollment",
+            data: { enrollments: addEnrollments },
+            dataType: "json",
+            success: function (r) {
+                console.log(r);
+            }
+          });
+          
+          $.ajax({
+                      type: "POST",
+                      url: "/Student/Course/RemoveEnrollment",
+                      data: { enrollments: removeEnrollments },
+                      dataType: "json",
+                      success: function (r) {
+                          console.log(r);
+                      }
+                    });
+          
+        });
+    </script>
+}
