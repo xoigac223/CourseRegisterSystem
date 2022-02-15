@@ -4,8 +4,11 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<h1>Danh sách đăng ký của sinh viên @ViewData["StudentName"]</h1>
-
+<h1>Danh sách đăng ký của sinh viên @ViewData["StudentName"] - Kỳ @ViewData["TermName"]</h1>
+@if (!(bool) ViewData["IsActive"])
+{
+    <h1>Chưa đến hoặc đã quá thời hạn đăng ký</h1>
+}
 <table class="table">
     <thead>
         <tr>

@@ -5,7 +5,12 @@ namespace CourseRegisterSystem.Models
 {
     public partial class Enrollment
     {
+        [Display(Name = "Mã lớp")]
+        [Required]
         public long ClassId { get; set; }
+        
+        [Display(Name = "Mã số sinh viên")]
+        [Required]
         public string StudentId { get; set; } = null!;
 
         [DataType(DataType.Date)]

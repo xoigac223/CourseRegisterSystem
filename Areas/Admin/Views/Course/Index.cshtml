@@ -1,0 +1,69 @@
+@model IEnumerable<CourseRegisterSystem.Models.Enrollment>
+
+@{
+    ViewData["Title"] = "Quản lý";
+}
+
+<h2>Danh sách đăng ký</h2>
+
+<p>
+    <a asp-action="Create">Đăng ký mới</a>
+</p>
+
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Start: <input type="date" id="txtStartDate" name="startDate" class="start-date form-control"/>
+            End: <input type="date" id="textEnd" name="endDate" class="end-date form-control"/>
+            <input type="submit" value="Search" class="btn btn-default"/> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Mã lớp
+            </th>
+            <th>
+                Mã học phần
+            </th>
+            <th>
+                Mã số sinh viên
+            </th>
+            <th>
+                Tên sinh viên
+            </th>
+            <th>
+                Ngày đăng ký
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClassId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Class.CourseId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StudentId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Student.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateAt)
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-route-classId="@item.ClassId" asp-route-studentId="@item.StudentId">Xóa</a> 
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

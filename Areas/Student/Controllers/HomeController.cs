@@ -22,6 +22,8 @@ public class HomeController : BaseController
             Models.Student currentStudent = GetStudent();
             ViewData["StudentName"] = currentStudent.Name;
             var termId = GetTermId();
+            var term = _context.Terms.FirstOrDefault(t => t.Id == termId);
+            ViewData["TermName"] = term.Name;
             var enrollments = await _context.Enrollments.Include(e => e.Class).Include(e => e.Student).Where(e => e.StudentId.Equals(currentStudent.Id))
                 .Where(e => e.Class.TermId.Equals(GetTermId())).ToListAsync();
 

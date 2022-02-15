@@ -1,0 +1,39 @@
+﻿@model CourseRegisterSystem.Models.Config
+
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<h1>Dành cho giáo vụ</h1>
+
+<h4>Cài đặt mở đăng ký</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="form-group">
+                <label asp-for="TermId" class="control-label"></label>
+                @Html.DropDownList("TermId", String.Empty)
+                <span asp-validation-for="TermId" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="ExpiryDate" class="control-label"></label>
+                <input asp-for="ExpiryDate" class="form-control" />
+                <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary"/>
+            </div>
+        </form>
+    </div>
+</div>
